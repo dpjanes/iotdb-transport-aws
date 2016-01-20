@@ -27,6 +27,8 @@ var iotdb_transport = require('iotdb-transport');
 var _ = iotdb._;
 
 var path = require('path');
+var unirest = require('unirest');
+var url = require('url');
 
 var util = require('util');
 var url = require('url');
@@ -41,26 +43,48 @@ var logger = iotdb.logger({
 /**
  *  Create a transport for AWS.
  */
-var AWSTransport = function (initd, native) {
+var AWSTransport = function (initd) {
     var self = this;
 
-    self.initd = _.defaults(
+    self.initd = _.d.compose.shallow(
         initd,
         {
             channel: iotdb_transport.channel,
             unchannel: iotdb_transport.unchannel,
-            encode: _encode,
-            decode: _decode,
-            pack: _pack,
-            unpack: _unpack,
+            pack: function(d) { return d },
         },
         iotdb.keystore().get("/transports/AWSTransport/initd"),
         {
-            prefix: ""
+            api: "https://api.homestar.io", 
+            "machine-id": "",
+            store: "things",
+            verbose: false,
+            add_timestamp: true,
         }
     );
-    
-    self.native = native;
+
+    if (_.is.Empty(self.initd["machine-id"])) {
+        throw new Error("machine_id is required");
+    };
+
+    if (_.is.Empty(self.initd.store)) {
+        throw new Error("store is required");
+    };
+
+    // create a prefix from "api" and "machine-id"
+    var parts = [
+        self.initd.api,
+        "iotdb",
+        "homestar",
+        "0",
+        self.initd["machine-id"] || "-",
+        self.initd.store || "-",
+    ];
+    parts = _.map(parts, function(part) {
+        return part.replace(/(^\/+|\/+$)/g, '');
+    });
+
+    self.initd.prefix = parts.join("/");
 };
 
 AWSTransport.prototype = new iotdb_transport.Transport;
@@ -73,6 +97,7 @@ AWSTransport.prototype._class = "AWSTransport";
  */
 AWSTransport.prototype.list = function(paramd, callback) {
     var self = this;
+    var ld;
 
     if (arguments.length === 1) {
         paramd = {};
@@ -81,9 +106,61 @@ AWSTransport.prototype.list = function(paramd, callback) {
 
     self._validate_list(paramd, callback);
 
-    callback({
-        end: true,
-    });
+    var _request = function(url) {
+        if (self.initd.verbose) {
+            logger.info({
+                url: url,
+            }, "requesting list");
+        }
+
+        unirest.get(url)
+            .type('json')
+            .end(function (result) {
+                if (result.error) {
+                    if (self.initd.verbose) {
+                        logger.info({
+                            url: url,
+                            error: _.error.message(result.error),
+                        }, "failure!");
+                    }
+
+                    ld = _.shallowCopy(paramd);
+                    ld.error = result.error;
+                    return callback(ld);
+                }
+
+                if (self.initd.verbose) {
+                    logger.info({
+                        url: url,
+                        body: result.body,
+                    }, "success!");
+                }
+
+                if (result.body.thing) {
+                    result.body.thing.map(function(thing_path) {
+                        var thing_url = self._path_url(thing_path);
+                        var parts = self.initd.unchannel(self.initd, thing_url);
+                        if (parts.length && parts[0] !== '.') {
+                            ld = _.shallowCopy(paramd);
+                            ld.id = parts[0];
+
+                            callback(ld);
+                        }
+                    });
+                }
+
+                if (!result.body.pivot) {
+                    ld = _.shallowCopy(paramd);
+                    ld.end = true;
+
+                    return callback(ld);
+                }
+
+                _request(self._path_url(result.body.pivot));
+            });
+    };
+
+    _request(self.initd.channel(self.initd));
 };
 
 /**
@@ -112,6 +189,7 @@ AWSTransport.prototype.get = function(paramd, callback) {
 
     var channel = self.initd.channel(self.initd, paramd.id, paramd.band);
 
+
     // callback(id, band, null); does not exist
     // OR
     // callback(id, band, undefined); don't know
@@ -125,20 +203,51 @@ AWSTransport.prototype.get = function(paramd, callback) {
 AWSTransport.prototype.update = function(paramd, callback) {
     var self = this;
 
-    self._validate_updated(paramd, callback);
+    self._validate_update(paramd, callback);
 
-    var channel = self.initd.channel(self.initd, paramd.id, paramd.band);
-    var d = self.initd.pack(paramd.value, paramd.id, paramd.band);
+    var ud = _.shallowCopy(paramd);
+    var channel = self.initd.channel(self.initd, ud.id, ud.band);
 
-    logger.error({
-        method: "update",
-        channel: channel,
-        d: d,
-    }, "NOT IMPLEMENTED");
+    if (self.initd.add_timestamp) {
+        ud.value = _.timestamp.add(ud.value);
+    }
 
-    callback({
-        error: new Error("not implemented"),
-    });
+    if (self.initd.verbose) {
+        logger.info({
+            channel: channel,
+            ud: ud,
+        }, "sending");
+    }
+
+    unirest.put(channel)
+        .type('json')
+        .json(ud.value)
+        .end(function (result) {
+            if (result.error) {
+                if (self.initd.verbose) {
+                    logger.info({
+                        channel: channel,
+                        error: _.error.message(result.error),
+                    }, "failure!");
+                }
+
+                ud.error = result.error;
+                return callback(ud);
+            }
+
+            if (self.initd.verbose) {
+                logger.info({
+                    channel: channel,
+                    body: result.body,
+                }, "success!");
+            }
+
+            if (result.body && result.body.value) {
+                ud.value = result.body.value;
+            }
+
+            callback(ud);
+        });
 };
 
 /**
@@ -167,30 +276,20 @@ AWSTransport.prototype.remove = function(paramd, callback) {
 };
 
 /* --- internals --- */
-var _encode = function(s) {
-    return s.replace(/[\/$%#.\]\[]/g, function(c) {
-        return '%' + c.charCodeAt(0).toString(16);
-    });
+AWSTransport.prototype._path_url = function(path) {
+    var self = this;
+
+    var urlp = url.parse(self.initd.api);
+    var pathp = url.parse(path);
+
+    urlp.pathname = pathp.pathname;
+    urlp.query = pathp.query;
+    urlp.search = pathp.search;
+
+    return url.format(urlp);
 };
 
-var _decode = function(s) {
-    return decodeURIComponent(s);
-}
-
-var _unpack = function(d) {
-    return _.d.transform(d, {
-        pre: _.ld_compact,
-        key: _decode,
-    });
-};
-
-var _pack = function(d) {
-    return _.d.transform(d, {
-        pre: _.ld_compact,
-        key: _encode,
-    });
-};
-
+                    
 /**
  *  API
  */

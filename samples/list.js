@@ -14,8 +14,9 @@ var Transport = require('../AWSTransport').AWSTransport;
 var transport = new Transport({
 });
 transport.list(function(ld) {
-    if (!ld) {
-        break;
+    if (ld.end) {
+        console.log("+", "-end-");
+        return
     }
 
     console.log("+", ld.id);

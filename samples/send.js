@@ -25,6 +25,7 @@ var _update = function() {
             last: "Janes",
             now: now,
         },
+    }, function() {
     });
 };
 
