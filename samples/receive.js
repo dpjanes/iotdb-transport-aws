@@ -13,6 +13,13 @@ var Transport = require('../AWSTransport').AWSTransport;
 
 var transport = new Transport({
 });
+transport.get({
+    id: "MyThingID", 
+    band: "meta", 
+}, function(ud) {
+    console.log("+", ud.id, ud.band, ud.value);
+});
+/*
 transport.updated({
     id: "MyThingID", 
     band: "meta", 
@@ -25,3 +32,4 @@ transport.updated({
         console.log("+", ud.id, ud.band, ud.value);
     }
 });
+*/
