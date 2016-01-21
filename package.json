@@ -5,7 +5,7 @@
     }, 
     "dependencies": {
         "iotdb": ">=0.11.0", 
-        "iotdb-transport": "~0.0.20", 
+        "iotdb-transport": "~0.0.21", 
         "unirest": "~0.4.2"
     }, 
     "description": "IOTDB Transport for AWS", 
@@ -34,5 +34,5 @@
         "cover": "istanbul cover _mocha tests", 
         "test": "grunt"
     }, 
-    "version": "0.0.1"
+    "version": "0.0.2"
 }
