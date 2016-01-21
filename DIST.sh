@@ -6,8 +6,6 @@
 #   2016-01-20
 #
 
-exit 0
-
 PACKAGE=iotdb-transport-aws
 DIST_ROOT=/var/tmp/.dist.$$
 
