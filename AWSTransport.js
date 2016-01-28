@@ -296,7 +296,7 @@ AWSTransport.prototype.about = function(paramd, callback) {
 /**
  *  See {iotdb_transport.Transport#Transport} for documentation.
  */
-AWSTransport.prototype.update = function(paramd, callback) {
+AWSTransport.prototype.put = function(paramd, callback) {
     var self = this;
 
     self._validate_update(paramd, callback);
