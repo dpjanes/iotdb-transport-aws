@@ -238,17 +238,17 @@ AWSTransport.prototype.get = function(paramd, callback) {
 /**
  *  See {iotdb_transport.Transport#Transport} for documentation.
  */
-AWSTransport.prototype.about = function(paramd, callback) {
+AWSTransport.prototype.bands = function(paramd, callback) {
     var self = this;
 
-    self._validate_about(paramd, callback);
+    self._validate_bands(paramd, callback);
 
     var ad = _.shallowCopy(paramd);
     var url = self.initd.channel(self.initd, ad.id);
 
     if (self.initd.verbose) {
         logger.info({
-            method: "about",
+            method: "bands",
             url: url,
             id: ad.id,
         }, "requesting thing");
@@ -261,7 +261,7 @@ AWSTransport.prototype.about = function(paramd, callback) {
             if (result.error) {
                 if (self.initd.verbose) {
                     logger.info({
-                        method: "about",
+                        method: "bands",
                         url: url,
                         error: _.error.message(result.error),
                     }, "failure!");
@@ -273,19 +273,19 @@ AWSTransport.prototype.about = function(paramd, callback) {
 
             if (self.initd.verbose) {
                 logger.info({
-                    method: "about",
+                    method: "bands",
                     url: url,
                     body: result.body,
                 }, "success!");
             }
 
-            ad.bands = [];
+            ad.bandd = {};
             for (var key in result.body) {
                 if (key.match(/^@/)) {
                     continue;
                 }
 
-                ad.bands.push(key);
+                ad.bandd[key] = null;
             }
 
             callback(ad);
