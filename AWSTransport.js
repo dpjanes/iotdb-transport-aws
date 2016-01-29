@@ -100,11 +100,6 @@ AWSTransport.prototype.list = function(paramd, callback) {
     var self = this;
     var ld;
 
-    if (arguments.length === 1) {
-        paramd = {};
-        callback = arguments[0];
-    }
-
     self._validate_list(paramd, callback);
 
     var _request = function(url) {
@@ -172,11 +167,6 @@ AWSTransport.prototype.list = function(paramd, callback) {
  */
 AWSTransport.prototype.added = function(paramd, callback) {
     var self = this;
-
-    if (arguments.length === 1) {
-        paramd = {};
-        callback = arguments[0];
-    }
 
     self._validate_added(paramd, callback);
 
@@ -351,11 +341,6 @@ AWSTransport.prototype.put = function(paramd, callback) {
  */
 AWSTransport.prototype.updated = function(paramd, callback) {
     var self = this;
-
-    if (arguments.length === 1) {
-        paramd = {};
-        callback = arguments[0];
-    }
 
     self._validate_updated(paramd, callback);
 };
