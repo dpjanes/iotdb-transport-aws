@@ -316,8 +316,7 @@ AWSTransport.prototype.put = function(paramd, callback) {
                     }, "failure!");
                 }
 
-                ud.error = result.error;
-                return callback(ud);
+                return callback(result.error, ud);
             }
 
             if (self.initd.verbose) {
@@ -331,7 +330,7 @@ AWSTransport.prototype.put = function(paramd, callback) {
                 ud.value = result.body.value;
             }
 
-            callback(ud);
+            callback(null, ud);
         });
 };
 
