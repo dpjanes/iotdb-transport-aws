@@ -13,7 +13,12 @@ var Transport = require('../AWSTransport').AWSTransport;
 
 var transport = new Transport({
 });
-transport.updated({}, function(ud) {
+transport.updated({}, function(error, ud) {
+    if (error) {
+        console.log("#", error);
+        return;
+    }
+
     if (ud.value === undefined) {
         transport.get(ud, function(error, gd) {
             if (error) {

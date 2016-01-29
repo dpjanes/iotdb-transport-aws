@@ -27,7 +27,7 @@ transport.get({
 transport.updated({
     id: "MyThingID", 
     band: "meta", 
-}, function(ud) {
+}, function(error, ud) {
     if (ud.value === undefined) {
         transport.get(ud, function(gd) {
             console.log("+", gd.id, gd.band, gd.value);
