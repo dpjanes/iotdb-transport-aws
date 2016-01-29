@@ -123,8 +123,7 @@ AWSTransport.prototype.list = function(paramd, callback) {
                     }
 
                     ld = _.shallowCopy(paramd);
-                    ld.error = result.error;
-                    return callback(ld);
+                    return callback(result.error, ld);
                 }
 
                 if (self.initd.verbose) {
@@ -143,16 +142,13 @@ AWSTransport.prototype.list = function(paramd, callback) {
                             ld = _.shallowCopy(paramd);
                             ld.id = parts[0];
 
-                            callback(ld);
+                            callback(null, ld);
                         }
                     });
                 }
 
                 if (!result.body.pivot) {
-                    ld = _.shallowCopy(paramd);
-                    ld.end = true;
-
-                    return callback(ld);
+                    return callback(null, null);
                 }
 
                 _request(self._path_url(result.body.pivot));
