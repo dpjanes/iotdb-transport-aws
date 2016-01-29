@@ -206,8 +206,7 @@ AWSTransport.prototype.get = function(paramd, callback) {
                     }, "failure!");
                 }
 
-                gd.error = result.error;
-                return callback(gd);
+                return callback(result.error, gd);
             }
 
             if (self.initd.verbose) {
@@ -221,7 +220,7 @@ AWSTransport.prototype.get = function(paramd, callback) {
             gd.value = result.body;
             delete gd.value["@id"];
 
-            callback(gd);
+            callback(null, gd);
         });
 };
 

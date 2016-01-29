@@ -16,7 +16,11 @@ var transport = new Transport({
 transport.get({
     id: "MyThingID", 
     band: "meta", 
-}, function(ud) {
+}, function(error, ud) {
+    if (error) {
+        console.log("#", error);
+        return;
+    }
     console.log("+", ud.id, ud.band, ud.value);
 });
 /*
