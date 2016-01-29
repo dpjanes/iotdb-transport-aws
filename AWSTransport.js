@@ -256,8 +256,7 @@ AWSTransport.prototype.bands = function(paramd, callback) {
                     }, "failure!");
                 }
 
-                ad.error = result.error;
-                return callback(ad);
+                return callback(result.error, ad);
             }
 
             if (self.initd.verbose) {
@@ -277,7 +276,7 @@ AWSTransport.prototype.bands = function(paramd, callback) {
                 ad.bandd[key] = null;
             }
 
-            callback(ad);
+            callback(null, ad);
         });
 };
 
