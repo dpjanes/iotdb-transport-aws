@@ -47,15 +47,15 @@ var AWSTransport = function (initd) {
     var self = this;
 
     self.initd = _.d.compose.shallow(
-        initd,
-        {
+        initd, {
             channel: iotdb_transport.channel,
             unchannel: iotdb_transport.unchannel,
-            pack: function(d) { return d },
+            pack: function (d) {
+                return d;
+            },
         },
-        iotdb.keystore().get("/transports/AWSTransport/initd"),
-        {
-            api: "https://api.homestar.io", 
+        iotdb.keystore().get("/transports/AWSTransport/initd"), {
+            api: "https://api.homestar.io",
             "machine-id": "",
             store: "things",
             verbose: false,
@@ -66,11 +66,11 @@ var AWSTransport = function (initd) {
 
     if (_.is.Empty(self.initd["machine-id"])) {
         throw new Error("machine_id is required");
-    };
+    }
 
     if (_.is.Empty(self.initd.store)) {
         throw new Error("store is required");
-    };
+    }
 
     // create a prefix from "api" and "machine-id"
     var parts = [
@@ -81,14 +81,14 @@ var AWSTransport = function (initd) {
         self.initd["machine-id"] || "-",
         self.initd.store || "-",
     ];
-    parts = _.map(parts, function(part) {
+    parts = _.map(parts, function (part) {
         return part.replace(/(^\/+|\/+$)/g, '');
     });
 
     self.initd.prefix = parts.join("/");
 };
 
-AWSTransport.prototype = new iotdb_transport.Transport;
+AWSTransport.prototype = new iotdb_transport.Transport();
 AWSTransport.prototype._class = "AWSTransport";
 
 /* --- methods --- */
@@ -96,13 +96,13 @@ AWSTransport.prototype._class = "AWSTransport";
 /**
  *  See {iotdb_transport.Transport#Transport} for documentation.
  */
-AWSTransport.prototype.list = function(paramd, callback) {
+AWSTransport.prototype.list = function (paramd, callback) {
     var self = this;
     var ld;
 
     self._validate_list(paramd, callback);
 
-    var _request = function(url) {
+    var _request = function (url) {
         if (self.initd.verbose) {
             logger.info({
                 method: "list",
@@ -135,7 +135,7 @@ AWSTransport.prototype.list = function(paramd, callback) {
                 }
 
                 if (result.body.thing) {
-                    result.body.thing.map(function(thing_path) {
+                    result.body.thing.map(function (thing_path) {
                         var thing_url = self._path_url(thing_path);
                         var parts = self.initd.unchannel(self.initd, thing_url);
                         if (parts.length && parts[0] !== '.') {
@@ -161,7 +161,7 @@ AWSTransport.prototype.list = function(paramd, callback) {
 /**
  *  See {iotdb_transport.Transport#Transport} for documentation.
  */
-AWSTransport.prototype.added = function(paramd, callback) {
+AWSTransport.prototype.added = function (paramd, callback) {
     var self = this;
 
     self._validate_added(paramd, callback);
@@ -172,7 +172,7 @@ AWSTransport.prototype.added = function(paramd, callback) {
 /**
  *  See {iotdb_transport.Transport#Transport} for documentation.
  */
-AWSTransport.prototype.get = function(paramd, callback) {
+AWSTransport.prototype.get = function (paramd, callback) {
     var self = this;
 
     self._validate_get(paramd, callback);
@@ -223,7 +223,7 @@ AWSTransport.prototype.get = function(paramd, callback) {
 /**
  *  See {iotdb_transport.Transport#Transport} for documentation.
  */
-AWSTransport.prototype.bands = function(paramd, callback) {
+AWSTransport.prototype.bands = function (paramd, callback) {
     var self = this;
 
     self._validate_bands(paramd, callback);
@@ -280,7 +280,7 @@ AWSTransport.prototype.bands = function(paramd, callback) {
 /**
  *  See {iotdb_transport.Transport#Transport} for documentation.
  */
-AWSTransport.prototype.put = function(paramd, callback) {
+AWSTransport.prototype.put = function (paramd, callback) {
     var self = this;
 
     self._validate_update(paramd, callback);
@@ -332,7 +332,7 @@ AWSTransport.prototype.put = function(paramd, callback) {
 /**
  *  See {iotdb_transport.Transport#Transport} for documentation.
  */
-AWSTransport.prototype.updated = function(paramd, callback) {
+AWSTransport.prototype.updated = function (paramd, callback) {
     var self = this;
 
     self._validate_updated(paramd, callback);
@@ -341,7 +341,7 @@ AWSTransport.prototype.updated = function(paramd, callback) {
 /**
  *  See {iotdb_transport.Transport#Transport} for documentation.
  */
-AWSTransport.prototype.remove = function(paramd, callback) {
+AWSTransport.prototype.remove = function (paramd, callback) {
     var self = this;
 
     self._validate_remove(paramd, callback);
@@ -350,7 +350,7 @@ AWSTransport.prototype.remove = function(paramd, callback) {
 };
 
 /* --- internals --- */
-AWSTransport.prototype._path_url = function(path) {
+AWSTransport.prototype._path_url = function (path) {
     var self = this;
 
     var urlp = url.parse(self.initd.api);
@@ -363,7 +363,7 @@ AWSTransport.prototype._path_url = function(path) {
     return url.format(urlp);
 };
 
-                    
+
 /**
  *  API
  */
