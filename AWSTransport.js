@@ -24,6 +24,7 @@
 
 var iotdb = require('iotdb');
 var iotdb_transport = require('iotdb-transport');
+var errors = iotdb_transport.errors;
 var _ = iotdb._;
 
 var path = require('path');
@@ -346,7 +347,11 @@ AWSTransport.prototype.remove = function (paramd, callback) {
 
     self._validate_remove(paramd, callback);
 
-    var channel = self.initd.channel(self.intid, paramd.id, paramd.band);
+    var rd = _.shallowCopy(paramd);
+    delete rd.band;
+    delete rd.value;
+
+    callback(new errors.NotImplemented(), rd);
 };
 
 /* --- internals --- */
