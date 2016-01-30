@@ -123,7 +123,7 @@ AWSTransport.prototype.list = function (paramd, callback) {
                         }, "failure!");
                     }
 
-                    ld = _.shallowCopy(paramd);
+                    ld = _.d.clone.shallow(paramd);
                     return callback(result.error, ld);
                 }
 
@@ -140,7 +140,7 @@ AWSTransport.prototype.list = function (paramd, callback) {
                         var thing_url = self._path_url(thing_path);
                         var parts = self.initd.unchannel(self.initd, thing_url);
                         if (parts.length && parts[0] !== '.') {
-                            ld = _.shallowCopy(paramd);
+                            ld = _.d.clone.shallow(paramd);
                             ld.id = parts[0];
 
                             callback(null, ld);
@@ -178,7 +178,7 @@ AWSTransport.prototype.get = function (paramd, callback) {
 
     self._validate_get(paramd, callback);
 
-    var gd = _.shallowCopy(paramd);
+    var gd = _.d.clone.shallow(paramd);
     var url = self.initd.channel(self.initd, gd.id, gd.band);
 
     if (self.initd.verbose) {
@@ -229,7 +229,7 @@ AWSTransport.prototype.bands = function (paramd, callback) {
 
     self._validate_bands(paramd, callback);
 
-    var ad = _.shallowCopy(paramd);
+    var ad = _.d.clone.shallow(paramd);
     var url = self.initd.channel(self.initd, ad.id);
 
     if (self.initd.verbose) {
@@ -286,7 +286,7 @@ AWSTransport.prototype.put = function (paramd, callback) {
 
     self._validate_update(paramd, callback);
 
-    var ud = _.shallowCopy(paramd);
+    var ud = _.d.clone.shallow(paramd);
     var channel = self.initd.channel(self.initd, ud.id, ud.band);
 
     if (self.initd.add_timestamp) {
@@ -347,7 +347,7 @@ AWSTransport.prototype.remove = function (paramd, callback) {
 
     self._validate_remove(paramd, callback);
 
-    var rd = _.shallowCopy(paramd);
+    var rd = _.d.clone.shallow(paramd);
     delete rd.band;
     delete rd.value;
 
