@@ -4,8 +4,8 @@
         "url": "https://github.com/dpjanes/iotdb-transport-aws/issues"
     }, 
     "dependencies": {
-        "iotdb": ">=0.12.0", 
-        "iotdb-transport": "~0.0.30", 
+        "iotdb": ">=0.13.0", 
+        "iotdb-transport": "~0.0.31", 
         "unirest": "~0.4.2"
     }, 
     "description": "IOTDB Transport for AWS", 
@@ -34,5 +34,5 @@
         "cover": "istanbul cover _mocha tests", 
         "test": "grunt"
     }, 
-    "version": "0.0.4"
+    "version": "0.0.5"
 }
