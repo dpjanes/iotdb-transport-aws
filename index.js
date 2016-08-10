@@ -23,3 +23,8 @@
 "use strict";
 
 exports.Transport = require('./AWSTransport').AWSTransport;
+
+const transporter = require('./transporter');
+exports.make = transporter.make;
+
+
